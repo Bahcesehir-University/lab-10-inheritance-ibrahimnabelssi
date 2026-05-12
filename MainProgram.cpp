@@ -1,176 +1,132 @@
-// ================================================================
-// Lab: Inheritance in C++
-// Course: Object-Oriented Programming for Engineers
-// File: MainProgram.cpp
-// ================================================================
-// INSTRUCTIONS:
-//   Complete every TODO. Do NOT change function signatures.
-//   All code stays in this single file. No .h files allowed.
-// ================================================================
-
 #include <iostream>
 #include <string>
-
-// ================================================================
-// CLASS DEFINITIONS
-// ================================================================
-
-// ----------------------------------------------------------------
-// Base Class: Vehicle
-// ----------------------------------------------------------------
-// Represents a generic vehicle.
-// Data members (protected):
-//   - make       (std::string)  : e.g. "Toyota"
-//   - year       (int)          : e.g. 2020
-//   - fuelLevel  (double)       : 0.0 - 100.0 (percentage)
-//
-// Methods:
-//   - Constructor(make, year, fuelLevel)
-//   - getMake()       -> std::string  (const)
-//   - getYear()       -> int          (const)
-//   - getFuelLevel()  -> double       (const)
-//   - refuel(amount)  -> void         : adds amount to fuelLevel,
-//                                       clamps max to 100.0
-//   - describe()      -> std::string  : pure virtual
-//   - virtual destructor
-// ----------------------------------------------------------------
+#include <sstream>
 
 class Vehicle {
 protected:
-    // TODO: declare protected data members
-    //       std::string make
-    //       int year
-    //       double fuelLevel
+    std::string make;
+    int year;
+    double fuelLevel;
 
 public:
-    // TODO: declare constructor
-    //       Vehicle(std::string make, int year, double fuelLevel)
+    Vehicle(std::string make, int year, double fuelLevel);
 
-    // TODO: declare getters (const)
-    //       getMake(), getYear(), getFuelLevel()
+    std::string getMake() const;
+    int getYear() const;
+    double getFuelLevel() const;
 
-    // TODO: declare refuel(double amount)
-    //       Adds amount to fuelLevel. Max is 100.0. Ignore negative amounts.
+    void refuel(double amount);
 
-    // TODO: declare pure virtual describe() returning std::string
+    virtual std::string describe() = 0;
 
-    // TODO: declare virtual destructor
+    virtual ~Vehicle() = default;
 };
-
-// ----------------------------------------------------------------
-// Derived Class: Car
-// ----------------------------------------------------------------
-// Inherits from Vehicle.
-// Additional data (private):
-//   - numDoors (int)
-//
-// Methods:
-//   - Constructor(make, year, fuelLevel, numDoors)
-//     -> must call Vehicle constructor
-//   - getNumDoors() -> int (const)
-//   - describe()    -> std::string (override)
-//     Format: "Car: <make> (<year>), <numDoors> doors, fuel: <fuelLevel>%"
-//     Example: "Car: Toyota (2020), 4 doors, fuel: 75.5%"
-// ----------------------------------------------------------------
 
 class Car : public Vehicle {
 private:
-    // TODO: int numDoors
+    int numDoors;
 
 public:
-    // TODO: Constructor(make, year, fuelLevel, numDoors)
+    Car(std::string make, int year, double fuelLevel, int numDoors);
 
-    // TODO: getNumDoors()
+    int getNumDoors() const;
 
-    // TODO: describe() override
+    std::string describe() override;
 };
-
-// ----------------------------------------------------------------
-// Derived Class: Truck
-// ----------------------------------------------------------------
-// Inherits from Vehicle.
-// Additional data (private):
-//   - payloadTons (double)   : cargo capacity in tons
-//
-// Methods:
-//   - Constructor(make, year, fuelLevel, payloadTons)
-//     -> must call Vehicle constructor
-//   - getPayloadTons() -> double (const)
-//   - describe()       -> std::string (override)
-//     Format: "Truck: <make> (<year>), payload: <payloadTons>t, fuel: <fuelLevel>%"
-//     Example: "Truck: Ford (2018), payload: 5.5t, fuel: 60%"
-// ----------------------------------------------------------------
 
 class Truck : public Vehicle {
 private:
-    // TODO: double payloadTons
+    double payloadTons;
 
 public:
-    // TODO: Constructor(make, year, fuelLevel, payloadTons)
+    Truck(std::string make, int year, double fuelLevel, double payloadTons);
 
-    // TODO: getPayloadTons()
+    double getPayloadTons() const;
 
-    // TODO: describe() override
+    std::string describe() override;
 };
 
-// ================================================================
-// FUNCTION IMPLEMENTATIONS
-// ================================================================
+// Vehicle implementations
 
-// ----------------------------------------------------------------
-// Vehicle member function implementations
-// ----------------------------------------------------------------
+Vehicle::Vehicle(std::string make, int year, double fuelLevel)
+    : make(make), year(year), fuelLevel(fuelLevel) {
+}
 
-// TODO: Implement Vehicle constructor
+std::string Vehicle::getMake() const {
+    return make;
+}
 
-// TODO: Implement getMake(), getYear(), getFuelLevel()
+int Vehicle::getYear() const {
+    return year;
+}
 
-// TODO: Implement refuel(double amount)
-//       Rules:
-//         - Ignore if amount <= 0
-//         - fuelLevel += amount
-//         - If fuelLevel > 100.0, clamp to 100.0
+double Vehicle::getFuelLevel() const {
+    return fuelLevel;
+}
 
-// ----------------------------------------------------------------
-// Car member function implementations
-// ----------------------------------------------------------------
+void Vehicle::refuel(double amount) {
+    if (amount <= 0) {
+        return;
+    }
 
-// TODO: Implement Car constructor (chain to Vehicle)
+    fuelLevel += amount;
 
-// TODO: Implement getNumDoors()
+    if (fuelLevel > 100.0) {
+        fuelLevel = 100.0;
+    }
+}
 
-// TODO: Implement describe()
-//       Hint: use std::ostringstream for formatted decimal output
+// Car implementations
 
-// ----------------------------------------------------------------
-// Truck member function implementations
-// ----------------------------------------------------------------
+Car::Car(std::string make, int year, double fuelLevel, int numDoors)
+    : Vehicle(make, year, fuelLevel), numDoors(numDoors) {
+}
 
-// TODO: Implement Truck constructor (chain to Vehicle)
+int Car::getNumDoors() const {
+    return numDoors;
+}
 
-// TODO: Implement getPayloadTons()
+std::string Car::describe() {
+    std::ostringstream oss;
 
-// TODO: Implement describe()
+    oss << "Car: " << make << " (" << year << "), "
+        << numDoors << " doors, fuel:" << fuelLevel << "%";
 
-// ================================================================
-// MAIN
-// ================================================================
+    return oss.str();
+}
+
+// Truck implementations
+
+Truck::Truck(std::string make, int year, double fuelLevel, double payloadTons)
+    : Vehicle(make, year, fuelLevel), payloadTons(payloadTons) {
+}
+
+double Truck::getPayloadTons() const {
+    return payloadTons;
+}
+
+std::string Truck::describe() {
+    std::ostringstream oss;
+
+    oss << "Truck: " << make << " (" << year << "), payload: "
+        << payloadTons << ", fuel:" << fuelLevel << "%";
+
+    return oss.str();
+}
 
 int main() {
-    // --- Basic usage demo ---
-    Car   c("Toyota", 2020, 75.5, 4);
-    Truck t("Ford",   2018, 60.0, 5.5);
+    Car c("Toyota", 2020, 75.5, 4);
+    Truck t("Ford", 2018, 60.0, 5.5);
 
     std::cout << c.describe() << "\n";
     std::cout << t.describe() << "\n";
 
-    // Polymorphism via base pointer
     Vehicle* v1 = &c;
     Vehicle* v2 = &t;
+
     std::cout << v1->describe() << "\n";
     std::cout << v2->describe() << "\n";
 
-    // Refuel demo
     c.refuel(20.0);
     std::cout << "After refuel: " << c.getFuelLevel() << "%\n";
 
